@@ -76,6 +76,7 @@ namespace MP3Tagger.ViewModels {
 
         private ObservableCollection<FileSystemItemViewModel> _Items;
         private bool _IsExpanded;
+        private bool _IsSelected;
 
         #endregion // Fields
 
@@ -86,9 +87,10 @@ namespace MP3Tagger.ViewModels {
         public FileSystemItem Info { get; private set; }
         public string Name { get => _Name ; set => Set(ref _Name, value); }
         public string Path { get => _Path; set => Set(ref _Path, value); }
-
+        public FileSystemItemViewModel Parent { get; internal set; }
         public ObservableCollection<FileSystemItemViewModel> Items { get => _Items ?? (_Items = new ObservableCollection<FileSystemItemViewModel>()); set => Set(ref _Items, value); }
         public bool IsExpanded { get => _IsExpanded; set => Set(ref _IsExpanded, value); }
+        public bool IsSelected { get => _IsSelected; set => Set(ref _IsSelected, value); }
 
         #endregion // Properties
 
@@ -133,10 +135,10 @@ namespace MP3Tagger.ViewModels {
 
         private void InspectDirectory() {
             foreach( var dir in ((DirectoryInfo)Info.Information).GetDirectories()) {
-                Items.Add(new FileSystemItemViewModel(dir));
+                Items.Add(new FileSystemItemViewModel(dir) { Parent = this });
             }
             foreach (var file in ((DirectoryInfo)Info.Information).GetFiles()){
-                Items.Add(new FileSystemItemViewModel(file));
+                Items.Add(new FileSystemItemViewModel(file) { Parent = this });
             }
         }
 

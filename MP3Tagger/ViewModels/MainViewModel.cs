@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -16,11 +17,11 @@ namespace MP3Tagger.ViewModels {
 
         #region Fields 
 
-        private FileSystemItemViewModel _fevm;
         private ObservableCollection<FileSystemItemViewModel> _Items;
         private FileSystemItemViewModel _SelectedLocation;
         private ICollectionView _SearchResults;
-        private string _TreeText;
+        private string _TreeText = string.Empty;
+        private MusicEditorViewModel _Manager;
 
         #endregion // Fields
 
@@ -29,15 +30,24 @@ namespace MP3Tagger.ViewModels {
         public string SearchText { get; set; } = "Search";
         public ICollectionView SearchResults { get => _SearchResults; set => Set(ref _SearchResults, value); }
 
-        public ObservableCollection<FileSystemItemViewModel> Items { get => _Items ?? (_Items = new ObservableCollection<FileSystemItemViewModel>()); set => Set(ref _Items,value); }
-        public FileSystemItemViewModel SelectedLocation { get => _SelectedLocation;
-            set => Set(ref _SelectedLocation, value); }
+        public ObservableCollection<FileSystemItemViewModel> Items { get => _Items ?? (_Items = new ObservableCollection<FileSystemItemViewModel>()); set => Set(ref _Items, value); }
+        public FileSystemItemViewModel SelectedLocation {
+            get => _SelectedLocation;
+            set {
+                if (Set(ref _SelectedLocation, value)) {
+                    if (value.Info.Information is DirectoryInfo ) Manager = new MusicEditorViewModel(value.Info.Information as DirectoryInfo);
+                }
+            }
+        }
+
+        public MusicEditorViewModel Manager {get => _Manager; set => Set(ref _Manager, value);}
+
         public string TreeText {
             get => _TreeText;
             internal set {
                 if (Set(ref _TreeText, value)) {
-                    FindNode();
                 }
+                FindNode();
             }
         }
 
@@ -97,7 +107,21 @@ namespace MP3Tagger.ViewModels {
         #region Methods 
 
         private void FindNode() {
-            
+            if (string.IsNullOrEmpty(TreeText)) return;
+            Debug.WriteLine(string.Format("TreeText \t{0}", TreeText));
+            var oldNode = SelectedLocation;
+            var node = SelectedLocation.Parent?.Items.Where(p => p.Name != oldNode.Name && p.Name.ToLower().StartsWith(TreeText.ToLower())).FirstOrDefault();
+            if (node != default(FileSystemItemViewModel)) {
+                node.IsSelected = true;
+            } else {
+                node = SelectedLocation.Items.Where(p => p.Name != oldNode.Name && p.Name.ToLower().StartsWith(TreeText.ToLower())).FirstOrDefault();
+                if (node != default(FileSystemItemViewModel)) {
+                    node.Parent.IsExpanded = true;
+                    node.Parent.IsSelected = true;
+                    node.IsSelected = true;
+                }
+            }
+
         }
 
         #endregion // Methods

@@ -10,10 +10,21 @@
         DataContext="{StaticResource MainWindowViewModel}"
         Title="MainWindow" Height="450" Width="800">
     <Window.Resources>
+        <Style x:Key="TreeViewItemStyle" TargetType="{x:Type TreeViewItem}">
+            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </Trigger>
+            </Style.Triggers>
+
+        </Style>
+
 
     </Window.Resources>
-    <DockPanel LastChildFill="False">
-
+    <DockPanel LastChildFill="True">
         <Grid DockPanel.Dock="Left" MaxWidth="200">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -27,17 +38,11 @@
                  MinWidth="100"
                  VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
         <TreeView Grid.Row="1" 
+                  ItemContainerStyle="{StaticResource TreeViewItemStyle}"
                   ItemsSource="{Binding Items}"
                   SelectedItemChanged='TreeView_SelectedItemChanged'
                   PreviewKeyDown="TreeView_PreviewKeyDown"
                   >
-            <TreeView.ItemContainerStyle>
-                <Style TargetType="{x:Type TreeViewItem}">
-                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
-                    <Setter Property="KeyboardNavigation.AcceptsReturn" Value="True" />
-                </Style>
-            </TreeView.ItemContainerStyle>
-
             <TreeView.Resources>
                 <HierarchicalDataTemplate DataType="{x:Type viewmodels:FileSystemItemViewModel}" ItemsSource="{Binding Items}">
                     <StackPanel Orientation="Horizontal">
@@ -67,7 +72,6 @@
                 </Style>
                 -->
             </TreeView.Resources>
-
         </TreeView>
         </Grid>
 
@@ -79,6 +83,7 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
+        <ContentControl Content="{Binding Manager}"/>
 
     </DockPanel>
 

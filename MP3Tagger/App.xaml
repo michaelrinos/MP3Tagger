@@ -4,12 +4,17 @@
              xmlns:local="clr-namespace:MP3Tagger"
              xmlns:conv="clr-namespace:MP3Tagger.Converters"
              xmlns:ViewModels="clr-namespace:MP3Tagger.ViewModels"
+             xmlns:Views="clr-namespace:MP3Tagger.Views"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ViewModels:MainViewModel x:Key="MainWindowViewModel"/>
 
         <conv:PathTypeToImage x:Key="PathToImage"/>
         <conv:IconToImageSource x:Key="IconToImageSource"/>
+
+        <DataTemplate DataType="{x:Type ViewModels:MusicEditorViewModel}">
+            <Views:MusicEditorView/>
+        </DataTemplate>
 
 
     </Application.Resources>
