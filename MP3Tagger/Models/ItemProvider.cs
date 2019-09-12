@@ -13,7 +13,7 @@ namespace MP3Tagger.Models {
             var items = new List<Item>();
 
             foreach (var s in Directory.GetLogicalDrives())
-                items.Add(new DirectoryItem { Name = s, Path = s });
+                items.Add(new DirectoryItem(s, s));
 
             return items;
         }
@@ -28,7 +28,7 @@ namespace MP3Tagger.Models {
 
                 foreach (var s in Directory.GetDirectories(path) ) {
                     var dirInfo = new DirectoryInfo(s);
-                    items.Add(new DirectoryItem { Name = dirInfo.Name, Path = dirInfo.FullName });
+                    items.Add(new DirectoryItem(dirInfo.Name, dirInfo.FullName));
                 }
             } catch (Exception e) {
                 Console.WriteLine(e);

@@ -19,11 +19,16 @@ namespace MP3Tagger.Models {
 
         public IList<Item> Items { get { return _Items ?? (_Items = new List<Item>()); } set { SetField(ref _Items, value); } }
 
-        public DirectoryItem() {
-            Items = new List<Item>();
-            if (Directory.GetFiles(Path).Length > 0 || Directory.GetDirectories(Path).Length > 0)
-                Items.Add(null);
-        }
+        public DirectoryItem(string name, string path) { 
+            Name = name;
+            Path = path;
+
+            try {
+                Items = new ObservableCollection<Item>(ItemProvider.GetItems(Path));
+            }catch(Exception e) {
+                Console.WriteLine(e);
+            }
+        } 
 
         public override bool IsExpanded {
             get { return base.IsExpanded; }

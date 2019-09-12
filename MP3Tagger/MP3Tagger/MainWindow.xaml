@@ -10,26 +10,36 @@
         DataContext="{StaticResource MainWindowViewModel}"
         Title="MainWindow" Height="450" Width="800">
     <Window.Resources>
-
+    <!--
+        <HierarchicalDataTemplate DataType="{x:Type viewmodels:FileSystemItemViewModel}" ItemsSource="{Binding Items}">
+            <TextBlock Text="{Binding Name}" ToolTip="{Binding Path}"/>
+        </HierarchicalDataTemplate>
+        -->
     </Window.Resources>
-    <DockPanel LastChildFill="False">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-        <Grid DockPanel.Dock="Left" MaxWidth="200">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
         <TextBox Text="{Binding SearchText, UpdateSourceTrigger=Explicit}"
+                 Grid.ColumnSpan="2"
                  Background="GhostWhite"
-                 PreviewKeyUp="TextBox_PreviewKeyUp"
                  GotFocus="TextBox_GotFocus" 
                  LostFocus="TextBox_LostFocus" 
-                 MinWidth="100"
                  VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
-        <TreeView Grid.Row="1" 
+        <TreeView Grid.Row="1" Grid.RowSpan="4" Grid.ColumnSpan="2" 
                   ItemsSource="{Binding Items}"
-                  SelectedItemChanged='TreeView_SelectedItemChanged'
-                  PreviewKeyDown="TreeView_PreviewKeyDown"
                   >
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
@@ -69,17 +79,8 @@
             </TreeView.Resources>
 
         </TreeView>
-        </Grid>
+        
 
-        <ListView Background="White"
-                  ItemsSource="{Binding SearchResults}">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Name}"/>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-
-    </DockPanel>
+    </Grid>
 
 </Window>
