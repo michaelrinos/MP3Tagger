@@ -1,0 +1,15 @@
+﻿<Application x:Class="MP3Tagger.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:MP3Tagger"
+             xmlns:conv="clr-namespace:MP3Tagger.Converters"
+             xmlns:ViewModels="clr-namespace:MP3Tagger.ViewModels"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ViewModels:MainViewModel x:Key="MainWindowViewModel"/>
+
+        <conv:PathTypeToImage x:Key="PathToImage"/>
+
+
+    </Application.Resources>
+</Application>
