@@ -39,10 +39,19 @@ namespace MP3Tagger.ViewModels {
         public void LoadFiles() {
             if (CurrentDirectory == null)
                 return;
-            var files = CurrentDirectory.GetFiles("*.mp3");
-            foreach(var file in files) {
-                MusicFiles.Add(TagLib.File.Create(file.FullName));
+            try {
+                var files = CurrentDirectory.GetFiles("*.mp3");
+                Parallel.ForEach(files, file => {
+                    try {
+                        MusicFiles.Add(TagLib.File.Create(file.FullName));
+                    } catch (Exception e) {
+                        Console.WriteLine(e);
+                    }
+                });
+            } catch (Exception e) {
+
             }
+
 
         }
 

@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:MP3Tagger.Views"
+             xmlns:taglib="clr-namespace:TagLib;assembly=taglib-sharp"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -17,7 +18,22 @@
         </Style>
     -->
     </UserControl.Resources>
-    <DataGrid ItemsSource="{Binding MusicFiles}">
-            
+    <DataGrid ItemsSource="{Binding MusicFiles }">
+        <DataGrid.Columns>
+            <DataGridTemplateColumn Header="Tag Information">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate DataType="{x:Type taglib:Tag}">
+                        <TextBlock Text="{Binding Album}"/>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+                
+            </DataGridTemplateColumn>
+        </DataGrid.Columns>
+        <DataGrid.ItemTemplate>
+            <DataTemplate >
+                <TextBlock Text="{Binding Tag.Title}"/>
+            </DataTemplate>
+        </DataGrid.ItemTemplate>
+
     </DataGrid>
 </UserControl>

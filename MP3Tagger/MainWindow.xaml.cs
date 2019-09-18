@@ -72,7 +72,7 @@ namespace MP3Tagger {
                 timer.Tick += HandleTick;
             } else {
                 timer.Stop();
-                timer.Interval = TimeSpan.FromSeconds(1);
+                timer.Interval = TimeSpan.FromMilliseconds(500);
                 timer.Start();
             }
             var tv = sender as TreeView;
