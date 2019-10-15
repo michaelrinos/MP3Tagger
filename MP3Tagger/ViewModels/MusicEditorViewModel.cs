@@ -43,7 +43,9 @@ namespace MP3Tagger.ViewModels {
                 var files = CurrentDirectory.GetFiles("*.mp3");
                 Parallel.ForEach(files, file => {
                     try {
-                        MusicFiles.Add(TagLib.File.Create(file.FullName));
+                        var item = TagLib.File.Create(file.FullName);
+
+                        MusicFiles.Add(item);
                     } catch (Exception e) {
                         Console.WriteLine(e);
                     }

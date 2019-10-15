@@ -73,6 +73,7 @@
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\MusicEditorViewModel.cs" />
     <Compile Include="ViewModels\MusicFileViewModel.cs" />
+    <Compile Include="Views\Attached\DynamicBindingListView.cs" />
     <Compile Include="Views\MusicEditorView.xaml.cs">
       <DependentUpon>MusicEditorView.xaml</DependentUpon>
     </Compile>

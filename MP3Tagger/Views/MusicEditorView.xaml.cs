@@ -21,5 +21,9 @@ namespace MP3Tagger.Views {
         public MusicEditorView() {
             InitializeComponent();
         }
+
+        private void DataGrid_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e) {
+
+        }
     }
 }

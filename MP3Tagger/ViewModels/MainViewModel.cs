@@ -110,7 +110,7 @@ namespace MP3Tagger.ViewModels {
             if (string.IsNullOrEmpty(TreeText)) return;
             Debug.WriteLine(string.Format("TreeText \t{0}", TreeText));
             var oldNode = SelectedLocation;
-            var node = SelectedLocation.Parent?.Items.Where(p => p.Name != oldNode.Name && p.Name.ToLower().StartsWith(TreeText.ToLower())).FirstOrDefault();
+            var node = SelectedLocation?.Parent?.Items.Where(p => p.Name != oldNode.Name && p.Name.ToLower().StartsWith(TreeText.ToLower())).FirstOrDefault();
             if (node != default(FileSystemItemViewModel)) {
                 node.IsSelected = true;
             } else {
