@@ -1,11 +1,11 @@
-﻿using MicroMVVM;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace MP3Tagger.ViewModels {
     public class MusicEditorViewModel : ObservableObject {
@@ -19,6 +19,7 @@ namespace MP3Tagger.ViewModels {
 
         public DirectoryInfo CurrentDirectory { get; set; }
         public ObservableCollection<TagLib.File> MusicFiles { get; set; } = new ObservableCollection<TagLib.File>();
+
 
         #endregion // Properties
 
@@ -51,10 +52,25 @@ namespace MP3Tagger.ViewModels {
                     }
                 });
             } catch (Exception e) {
-
             }
 
 
+        }
+
+        public void RemoveDuplicates()
+        {
+            var query = MusicFiles.GroupBy(x => new { x?.Tag.FirstArtist, x?.Tag.Title })
+                .Where(g => g.Count() > 1)
+                .ToList();
+            Console.WriteLine(query);
+            var t = query.Select(x => x.First());
+            Parallel.ForEach(t, x => {
+                if (x == null)
+                    return;
+                File.Copy(x.Name, @"H:\Music\Copies\" + Path.GetFileName(x.Name));
+            });
+
+            
         }
 
 

@@ -63,12 +63,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\ArrayValuesToString.cs" />
     <Compile Include="Converters\IconToImageSource.cs" />
     <Compile Include="Converters\StringToIcon.cs" />
     <Compile Include="Converters\PathTypeToImage.cs" />
     <Compile Include="Converters\StringToImageSource.cs" />
     <Compile Include="Models\FileSystemItem.cs" />
     <Compile Include="Models\ShellfileInfo.cs" />
+    <Compile Include="ObservableObject.cs" />
     <Compile Include="ViewModels\FileSystemInfoViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\MusicEditorViewModel.cs" />
@@ -128,12 +130,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\hard_drive.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\MicroMVVM\MicroMVVM\MicroMVVM.csproj">
-      <Project>{12AACD27-DE13-4466-8647-FC1C59849591}</Project>
-      <Name>MicroMVVM</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

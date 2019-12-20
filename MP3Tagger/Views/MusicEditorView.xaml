@@ -27,44 +27,18 @@
         
 
     </UserControl.Resources>
-    <UniformGrid Rows="1">
-        <ListView ItemsSource="{Binding MusicFiles}"
+    <DockPanel>
+        <Button DockPanel.Dock="Bottom" Content="Click me" Click="Button_Click"/>
+        <UniformGrid Rows="1">
+            <ListView ItemsSource="{Binding MusicFiles}"
                   attached:DynamicBindingListView.GenerateColumnsGridView="True"
                   attached:DynamicBindingListView.InnerProperty="Tag"
                   >
-            <ListView.View>
-                <GridView/>
-            </ListView.View>
-        
-    </ListView>
+                <ListView.View>
+                    <GridView/>
+                </ListView.View>
+            </ListView>
 
-<!--
-    <DataGrid ItemsSource="{Binding MusicFiles}"
-              AutoGenerateColumns="True"
-              AutoGeneratingColumn="DataGrid_AutoGeneratingColumn"
-              >
-        
-        <DataGrid.Columns>
-            <DataGridTemplateColumn >
-                <DataGridTemplateColumn.CellTemplate >
-                    <DataTemplate DataType="{x:Type taglib:Tag}">
-                        <UniformGrid DataContext="{Binding Tag}">
-                            <TextBlock Text="Testing" Background="AliceBlue"/>
-                            <TextBlock Text="{Binding Album}" Background="AntiqueWhite"/>
-                            <TextBlock Text="{Binding Tag.Album}" Background="Aqua"/>
-                            <TextBlock Text="{Binding Artists[0]}" Background="Beige"/>
-                            <TextBlock Text="{Binding Year}" Background="Yellow"/>
-                            <TextBlock Text="{Binding Name}" Background="Red"/>
-
-                        </UniformGrid>
-                    </DataTemplate>
-
-                </DataGridTemplateColumn.CellTemplate>
-
-            </DataGridTemplateColumn>
-        </DataGrid.Columns>
-
-    </DataGrid>
-    -->
-    </UniformGrid>
+        </UniformGrid>
+    </DockPanel>
 </UserControl>

@@ -10,7 +10,8 @@ using System.Windows.Threading;
 using System.Windows;
 using System.Collections;
 using System.Windows.Data;
- 
+using MP3Tagger.Converters;
+
 namespace MP3Tagger.Views.Attached
 {
     public class DynamicBindingListView
@@ -97,29 +98,31 @@ namespace MP3Tagger.Views.Attached
             if (String.IsNullOrEmpty(GetInnerProperty(theListView))) {
                 theClassProperties = firstObject.GetType().GetProperties();
             } else {
-                var innerProperty = firstObject.GetType().GetProperty(GetInnerProperty(theListView));
-                theClassProperties = innerProperty.GetType().GetProperties();
+                var innerProperty = firstObject.GetType().GetProperty(GetInnerProperty(theListView))?.GetValue(firstObject);
+                theClassProperties = innerProperty?.GetType().GetProperties();
+                firstObject = (object)innerProperty;
+                
             }
             GridView gv = (GridView)theListView.View;
             foreach (PropertyInfo pi in theClassProperties)
             {
                 string columnName = pi.Name;
                 GridViewColumn grv = new GridViewColumn { Header = columnName };
- 
-                if (object.ReferenceEquals(pi.PropertyType, typeof(DateTime)))
-                {
+
+                if (object.ReferenceEquals(pi.PropertyType, typeof(DateTime))) {
                     Binding bnd = new Binding(columnName);
                     string formatString = (string)theListView.GetValue(DateFormatStringProperty);
-                    if (formatString != string.Empty)
-                    {
+                    if (formatString != string.Empty) {
                         bnd.StringFormat = formatString;
                     }
                     BindingOperations.SetBinding(grv, TextBlock.TextProperty, bnd);
                     grv.DisplayMemberBinding = bnd;
-                }
-                else
-                {
+                } else {
                     Binding bnd = new Binding(columnName);
+                    bnd.Source = firstObject;
+                    if (firstObject.GetType().GetProperty(columnName).GetValue(firstObject, null) is Array) {
+                        bnd.Converter = new ArrayValuesToString();
+                    }
                     BindingOperations.SetBinding(grv, TextBlock.TextProperty, bnd);
                     grv.DisplayMemberBinding = bnd;
                 }

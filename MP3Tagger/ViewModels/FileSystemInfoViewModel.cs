@@ -1,5 +1,4 @@
-﻿using MicroMVVM;
-using MP3Tagger.Models;
+﻿using MP3Tagger.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

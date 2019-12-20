@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MP3Tagger.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,6 +25,11 @@ namespace MP3Tagger.Views {
 
         private void DataGrid_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e) {
 
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            (this.DataContext as MusicEditorViewModel).RemoveDuplicates();
         }
     }
 }

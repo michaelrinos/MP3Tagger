@@ -1,13 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29215.179
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MP3Tagger", "MP3Tagger\MP3Tagger.csproj", "{681BDCB8-706C-45A0-A981-B759DE79D965}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicroMVVM", "..\MicroMVVM\MicroMVVM\MicroMVVM.csproj", "{12AACD27-DE13-4466-8647-FC1C59849591}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Converters", "..\MicroMVVM\Converters\Converters.csproj", "{B4A4824D-F221-46D6-9437-351231E56C0A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,14 +15,6 @@ Global
 		{681BDCB8-706C-45A0-A981-B759DE79D965}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{681BDCB8-706C-45A0-A981-B759DE79D965}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{681BDCB8-706C-45A0-A981-B759DE79D965}.Release|Any CPU.Build.0 = Release|Any CPU
-		{12AACD27-DE13-4466-8647-FC1C59849591}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{12AACD27-DE13-4466-8647-FC1C59849591}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{12AACD27-DE13-4466-8647-FC1C59849591}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{12AACD27-DE13-4466-8647-FC1C59849591}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B4A4824D-F221-46D6-9437-351231E56C0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B4A4824D-F221-46D6-9437-351231E56C0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B4A4824D-F221-46D6-9437-351231E56C0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B4A4824D-F221-46D6-9437-351231E56C0A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
