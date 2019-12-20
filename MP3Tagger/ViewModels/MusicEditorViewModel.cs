@@ -65,9 +65,11 @@ namespace MP3Tagger.ViewModels {
             Console.WriteLine(query);
             var t = query.Select(x => x.First());
             Parallel.ForEach(t, x => {
-                if (x == null)
-                    return;
-                File.Copy(x.Name, @"H:\Music\Copies\" + Path.GetFileName(x.Name));
+                try {
+                    if (x == null)
+                        return;
+                    File.Copy(x.Name, @"H:\Music\Copies\" + Path.GetFileName(x.Name));
+                }catch(Exception e) { Console.WriteLine(e); }
             });
 
             

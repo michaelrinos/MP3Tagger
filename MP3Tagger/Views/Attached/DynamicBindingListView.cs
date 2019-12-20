@@ -119,7 +119,7 @@ namespace MP3Tagger.Views.Attached
                     grv.DisplayMemberBinding = bnd;
                 } else {
                     Binding bnd = new Binding(columnName);
-                    bnd.Source = firstObject;
+                    bnd.Path = new PropertyPath(GetInnerProperty(theListView) + "." + pi.Name);
                     if (firstObject.GetType().GetProperty(columnName).GetValue(firstObject, null) is Array) {
                         bnd.Converter = new ArrayValuesToString();
                     }
