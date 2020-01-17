@@ -1,21 +1,25 @@
-﻿using System;
+﻿using MP3Tagger.Wrappers;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Linq;
 
 namespace MP3Tagger.ViewModels {
     public class MusicEditorViewModel : ObservableObject {
         #region Fields
 
-
+        private CheckableObservableCollection<string> _Options = 
+            new CheckableObservableCollection<string>() { "This", "is", "a", "test" };
 
         #endregion // Fields
 
         #region Properties
+
+        public CheckableObservableCollection<string> Options { get => _Options; set => Set(ref _Options, value); }
 
         public DirectoryInfo CurrentDirectory { get; set; }
         public ObservableCollection<TagLib.File> MusicFiles { get; set; } = new ObservableCollection<TagLib.File>();
@@ -30,6 +34,12 @@ namespace MP3Tagger.ViewModels {
         }
         public MusicEditorViewModel(DirectoryInfo path) {
             CurrentDirectory = path;
+
+            var t = typeof(TagLib.Tag).GetProperties().Select(x => x.Name).ToList();
+
+            _Options = new CheckableObservableCollection<string>(t);
+            _Options.SetCheck("Title", true);
+            _Options.SetCheck("FirstArtist", true);
             LoadFiles();
 
         }
@@ -57,22 +67,40 @@ namespace MP3Tagger.ViewModels {
 
         }
 
-        public void RemoveDuplicates()
-        {
-            var query = MusicFiles.GroupBy(x => new { x?.Tag.FirstArtist, x?.Tag.Title })
+        public void RemoveDuplicates() {
+            var CWOptions = Options.CheckedItems.Cast<CheckWrapper<string>>().ToList();
+            var options = CWOptions.Select(q => string.Format("Tag.{0}", q.Value));
+            string dynamicLinqGroupByKeySelector = 
+                "new (" + String.Join( ", ", options) + ")";
+
+
+            var query = MusicFiles
+                .GroupBy(x => dynamicLinqGroupByKeySelector)
                 .Where(g => g.Count() > 1)
                 .ToList();
+
+            var queryNew = System.Linq.Dynamic.Core.DynamicQueryableExtensions
+                .GroupBy(MusicFiles.AsQueryable(),
+                dynamicLinqGroupByKeySelector);
+            
+            var oldquery = MusicFiles.GroupBy(x => 
+                    new { x?.Tag.Title })
+                .Where(g => g.Count() > 1)
+                .ToList();
+            // */
             Console.WriteLine(query);
-            var t = query.Select(x => x.First());
+            var t = oldquery.Select(x => x.First());
+            //var t = queryNew.ToDynamicList().First();
+            var path = @"D:\Music\Copies\";
             Parallel.ForEach(t, x => {
                 try {
                     if (x == null)
                         return;
-                    File.Copy(x.Name, @"H:\Music\Copies\" + Path.GetFileName(x.Name));
-                }catch(Exception e) { Console.WriteLine(e); }
+                    var newlocation = Path.Combine(path, Path.GetFileName(x.Name));
+                    File.Copy(x.Name, newlocation, true);
+                }catch(Exception e) {
+                    Console.WriteLine(e); }
             });
-
-            
         }
 
 

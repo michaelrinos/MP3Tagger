@@ -83,6 +83,19 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
+
+        <ListBox ItemsSource="{Binding Manager.Options}" DockPanel.Dock="Right">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox IsChecked="{Binding IsChecked}" VerticalAlignment="Center"/>
+                        <ContentPresenter Content="{Binding Value}"/>
+
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            
+        </ListBox>
         <ContentControl Content="{Binding Manager}"/>
 
     </DockPanel>
