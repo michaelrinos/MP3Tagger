@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 
 namespace MP3Tagger.ViewModels {
     public class MusicEditorViewModel : ObservableObject {
@@ -73,7 +74,13 @@ namespace MP3Tagger.ViewModels {
             string dynamicLinqGroupByKeySelector = 
                 "new (" + String.Join( ", ", options) + ")";
 
-
+            var fp = MusicFiles.Select(x => x.Tag.FirstPerformer);
+            
+            var oldquery = MusicFiles.GroupBy(x => 
+                    new { x?.Tag.Title, x?.Tag.FirstPerformer })
+                .Where(g => g.Count() > 1)
+                .ToList();
+            /*
             var query = MusicFiles
                 .GroupBy(x => dynamicLinqGroupByKeySelector)
                 .Where(g => g.Count() > 1)
@@ -82,13 +89,28 @@ namespace MP3Tagger.ViewModels {
             var queryNew = System.Linq.Dynamic.Core.DynamicQueryableExtensions
                 .GroupBy(MusicFiles.AsQueryable(),
                 dynamicLinqGroupByKeySelector);
-            
-            var oldquery = MusicFiles.GroupBy(x => 
-                    new { x?.Tag.Title })
-                .Where(g => g.Count() > 1)
-                .ToList();
-            // */
+
             Console.WriteLine(query);
+            // */
+
+            var dl = MusicFiles.AsQueryable().GroupBy(dynamicLinqGroupByKeySelector).
+                Where("Count() > 1");
+
+            var t = dl.Select("First()").ToDynamicArray();
+            var path = @"D:\Music\Copies\";
+            Parallel.ForEach(t, x => {
+
+                try {
+                    if (x == null)
+                        return;
+                    var newlocation = Path.Combine(path, Path.GetFileName(x.Name));
+                    File.Copy(x.Name, newlocation, true);
+                } catch (Exception e) {
+                    Console.WriteLine(e);
+                }
+            });
+            
+            /*
             var t = oldquery.Select(x => x.First());
             //var t = queryNew.ToDynamicList().First();
             var path = @"D:\Music\Copies\";
@@ -101,6 +123,7 @@ namespace MP3Tagger.ViewModels {
                 }catch(Exception e) {
                     Console.WriteLine(e); }
             });
+            // */
         }
 
 
