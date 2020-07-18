@@ -94,11 +94,13 @@ namespace MP3Tagger.Views.Attached
         }
 
         private static void SetUpTheColumns(ListView theListView, object firstObject) {
-            PropertyInfo[] theClassProperties;
-            if (String.IsNullOrEmpty(GetInnerProperty(theListView))) {
+            PropertyInfo[] theClassProperties; // This is a TagLib Tag Object
+            var PropertyToBindTo = GetInnerProperty(theListView);
+            
+            if (String.IsNullOrEmpty(PropertyToBindTo)) {
                 theClassProperties = firstObject.GetType().GetProperties();
             } else {
-                var innerProperty = firstObject.GetType().GetProperty(GetInnerProperty(theListView))?.GetValue(firstObject);
+                var innerProperty = firstObject.GetType().GetProperty(PropertyToBindTo)?.GetValue(firstObject);
                 theClassProperties = innerProperty?.GetType().GetProperties();
                 firstObject = (object)innerProperty;
                 
@@ -107,6 +109,8 @@ namespace MP3Tagger.Views.Attached
             foreach (PropertyInfo pi in theClassProperties)
             {
                 string columnName = pi.Name;
+
+                // Set the header for the column
                 GridViewColumn grv = new GridViewColumn { Header = columnName };
 
                 if (object.ReferenceEquals(pi.PropertyType, typeof(DateTime))) {
@@ -122,10 +126,15 @@ namespace MP3Tagger.Views.Attached
                     bnd.Path = new PropertyPath(GetInnerProperty(theListView) + "." + pi.Name);
                     if (firstObject.GetType().GetProperty(columnName).GetValue(firstObject, null) is Array) {
                         bnd.Converter = new ArrayValuesToString();
+                    } else if (! (firstObject.GetType().GetProperty(columnName).GetValue(firstObject, null) is string) ||
+                               ! (firstObject.GetType().GetProperty(columnName).GetValue(firstObject, null) is bool )
+                        ) {
+                        continue; 
                     }
                     BindingOperations.SetBinding(grv, TextBlock.TextProperty, bnd);
                     grv.DisplayMemberBinding = bnd;
                 }
+                // Add the column to the Grid View (in this case the ListView)
                 gv.Columns.Add(grv);
             }
         }

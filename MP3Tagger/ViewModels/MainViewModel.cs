@@ -63,31 +63,57 @@ namespace MP3Tagger.ViewModels {
         }
 
         public void Search(FileSystemInfo info, string searchterm) {
-            StringBuilder pattern = new StringBuilder();
-            pattern.Append("(?i)");
-            foreach ( var letter in searchterm) {
-                pattern.Append("[^"); 
-                pattern.Append(letter);
-                pattern.Append("]*");
-                pattern.Append(letter);
-            }
-            Console.WriteLine(pattern.ToString());
-            Regex reg = new Regex(pattern.ToString());
-            IEnumerable<string> items;
-                
+            // First check that we were not provided a path
+            // C:\Users\mrino\Music\Test
             var results = new List<FileInfo>();
-            SearchResults = CollectionViewSource.GetDefaultView(results);
-            if (info is FileInfo) { // We are given a file
-                if (reg.IsMatch(info.Name)) {
-                    results.Add(info as FileInfo);
-                } else {
+            if (Regex.IsMatch(searchterm, @"[.\\/]", RegexOptions.IgnoreCase))
+            {
+                if (File.Exists(searchterm))
+                {
+                }else if (Directory.Exists(searchterm))
+                {
+                    var d = new DirectoryInfo(searchterm);
+                    Manager.CurrentDirectory = d;
+                    Manager.LoadFiles();
+                    //results.AddRange( d.GetFiles() );
+                    
                 }
+
             }
-            var dirInfo = info as DirectoryInfo;
-            foreach(var dir in dirInfo.GetDirectories()) { // We are given a directory, check its children directories
-                Search(dir, reg, results);
+            else
+            {
+                StringBuilder pattern = new StringBuilder();
+                // Fuzzy Search
+                pattern.Append("(?i)");
+                foreach (var letter in searchterm)
+                {
+                    pattern.Append("[^");
+                    pattern.Append(letter);
+                    pattern.Append("]*");
+                    pattern.Append(letter);
+                }
+                Console.WriteLine(pattern.ToString());
+                Regex reg = new Regex(pattern.ToString());
+                IEnumerable<string> items;
+
+                SearchResults = CollectionViewSource.GetDefaultView(results);
+                if (info is FileInfo)
+                { // We are given a file
+                    if (reg.IsMatch(info.Name))
+                    {
+                        results.Add(info as FileInfo);
+                    }
+                    else
+                    {
+                    }
+                }
+                var dirInfo = info as DirectoryInfo;
+                foreach (var dir in dirInfo.GetDirectories())
+                { // We are given a directory, check its children directories
+                    Search(dir, reg, results);
+                }
+                results.AddRange(dirInfo.GetFiles().Where(path => reg.IsMatch(path.Name)));
             }
-            results.AddRange(dirInfo.GetFiles().Where(path => reg.IsMatch(path.Name)));
         }
 
         public void Search(DirectoryInfo info, Regex reg, List<FileInfo> results) {
