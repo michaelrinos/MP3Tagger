@@ -28,7 +28,12 @@
 
     </UserControl.Resources>
     <DockPanel>
-        <Button DockPanel.Dock="Bottom" Content="Click me" Click="Button_Click"/>
+        <UniformGrid DockPanel.Dock="Bottom">
+            <Label Content="Export Path:"/>
+            <TextBox Text="{Binding ExportPath}"/>
+            <Label Content="Check For Duplicates:"/>
+            <Button DockPanel.Dock="Bottom" Content="Click me" Click="Button_Click"/>
+        </UniformGrid>
         <UniformGrid Rows="1">
             <ListView ItemsSource="{Binding MusicFiles}"
                   attached:DynamicBindingListView.GenerateColumnsGridView="True"

@@ -76,20 +76,32 @@ namespace MP3Tagger.Views.Attached
         public static readonly DependencyProperty DateFormatStringProperty = DependencyProperty.RegisterAttached("DateFormatString", typeof(string), typeof(DynamicBindingListView), new FrameworkPropertyMetadata(null));
         public static void thePropChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
-            ListView lv = (ListView)obj;
-            DependencyPropertyDescriptor descriptor = DependencyPropertyDescriptor.FromProperty(ListView.ItemsSourceProperty, typeof(ListView));
-            descriptor.AddValueChanged(lv, new EventHandler(ItemsSourceChanged));
+            if (obj is ListView)
+            {
+                ListView lv = (ListView)obj;
+                DependencyPropertyDescriptor descriptor = DependencyPropertyDescriptor.FromProperty(ListView.ItemsSourceProperty, typeof(ListView));
+                descriptor.AddValueChanged(lv, new EventHandler(ItemsSourceChanged));
+            }else if (obj is GridView)
+            {
+
+            }
         }
  
         private static void ItemsSourceChanged(object sender, EventArgs e)
         {
-            ListView lv = (ListView)sender;
-            IEnumerable its = lv.ItemsSource;
-            IEnumerator itsEnumerator = its.GetEnumerator();
-            bool hasItems = itsEnumerator.MoveNext();
-            if (hasItems)
+            if (sender is ListView)
             {
-                SetUpTheColumns(lv, itsEnumerator.Current);
+                ListView lv = (ListView)sender;
+                IEnumerable its = lv.ItemsSource;
+                IEnumerator itsEnumerator = its.GetEnumerator();
+                bool hasItems = itsEnumerator.MoveNext();
+                if (hasItems)
+                {
+                    SetUpTheColumns(lv, itsEnumerator.Current);
+                }
+            }else if (sender is GridView)
+            {
+
             }
         }
 
@@ -124,12 +136,11 @@ namespace MP3Tagger.Views.Attached
                 } else {
                     Binding bnd = new Binding(columnName);
                     bnd.Path = new PropertyPath(GetInnerProperty(theListView) + "." + pi.Name);
-                    if (firstObject.GetType().GetProperty(columnName).GetValue(firstObject, null) is Array) {
+                    //bnd.Source = firstObject;
+
+                    if (firstObject.GetType().GetProperty(columnName).GetValue(firstObject, null) is Array)
+                    {
                         bnd.Converter = new ArrayValuesToString();
-                    } else if (! (firstObject.GetType().GetProperty(columnName).GetValue(firstObject, null) is string) ||
-                               ! (firstObject.GetType().GetProperty(columnName).GetValue(firstObject, null) is bool )
-                        ) {
-                        continue; 
                     }
                     BindingOperations.SetBinding(grv, TextBlock.TextProperty, bnd);
                     grv.DisplayMemberBinding = bnd;

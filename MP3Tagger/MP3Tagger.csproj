@@ -68,6 +68,7 @@
     </ApplicationDefinition>
     <Compile Include="Converters\ArrayValuesToString.cs" />
     <Compile Include="Converters\IconToImageSource.cs" />
+    <Compile Include="Converters\ObjectToStringConverter.cs" />
     <Compile Include="Converters\StringToIcon.cs" />
     <Compile Include="Converters\PathTypeToImage.cs" />
     <Compile Include="Converters\StringToImageSource.cs" />

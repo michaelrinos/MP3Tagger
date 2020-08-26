@@ -19,9 +19,9 @@ namespace MP3Tagger.ViewModels {
         #endregion // Fields
 
         #region Properties
+        public string ExportPath { get; set; } = Properties.Settings.Default.ExportPath;
 
         public CheckableObservableCollection<string> Options { get => _Options; set => Set(ref _Options, value); }
-
         public DirectoryInfo CurrentDirectory { get; set; }
         public ObservableCollection<TagLib.File> MusicFiles { get; set; } = new ObservableCollection<TagLib.File>();
 
@@ -53,22 +53,38 @@ namespace MP3Tagger.ViewModels {
                 return;
             try {
                 var files = CurrentDirectory.GetFiles("*.mp3");
+                foreach(var file in files)
+                {
+                    try {
+                        var item = TagLib.File.Create(file.FullName);
+                        if (item != null && item != default(TagLib.File))
+                            MusicFiles.Add(item);
+                    } catch (Exception e) {
+                        Console.WriteLine(e);
+                    }
+
+                }
+                /*
                 Parallel.ForEach(files, file => {
                     try {
                         var item = TagLib.File.Create(file.FullName);
-
-                        MusicFiles.Add(item);
+                        if (item != null)
+                            MusicFiles.Add(item);
                     } catch (Exception e) {
                         Console.WriteLine(e);
                     }
                 });
+                */
             } catch (Exception e) {
             }
-
+        }
+        private static void FindAudioFiles()
+        {
 
         }
 
         public void RemoveDuplicates() {
+            /*
             var CWOptions = Options.CheckedItems.Cast<CheckWrapper<string>>().ToList();
             var options = CWOptions.Select(q => string.Format("Tag.{0}", q.Value));
             string dynamicLinqGroupByKeySelector = 
@@ -92,12 +108,12 @@ namespace MP3Tagger.ViewModels {
 
             Console.WriteLine(query);
             // */
-
+            /*
             var dl = MusicFiles.AsQueryable().GroupBy(dynamicLinqGroupByKeySelector).
                 Where("Count() > 1");
 
             var t = dl.Select("First()").ToDynamicArray();
-            var path = @"D:\Music\Copies\";
+            var path = @"C:\Copies\";
             Parallel.ForEach(t, x => {
 
                 try {
@@ -109,6 +125,39 @@ namespace MP3Tagger.ViewModels {
                     Console.WriteLine(e);
                 }
             });
+
+            */
+
+            var query = MusicFiles.GroupBy(x => new { x?.Tag.Title, x?.Tag.FirstPerformer })
+                .Where(g => g.Count() > 1)
+                //.Select(h => h.)
+                //.Cast<TagLib.Tag>()
+                .ToList()
+                ;
+
+            Console.WriteLine(query);
+            var dupes = query.Select(x => x.First());
+            if (!Directory.Exists(ExportPath))
+            {
+                Directory.CreateDirectory(ExportPath);
+            }
+            Parallel.ForEach(dupes, x => {
+                try {
+                    if (x == null)
+                        return;
+                    try
+                    {
+                        File.Move(x.Name, ExportPath + "\\" + Path.GetFileName(x.Name));
+                    }catch (IOException e)
+                    {
+                        Console.WriteLine(e.ToString());
+                        e = e;
+                    }
+                }catch(Exception e) { 
+                    Console.WriteLine(e); 
+                }
+            });
+            Console.WriteLine("Done");
             
             /*
             var t = oldquery.Select(x => x.First());

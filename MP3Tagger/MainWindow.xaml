@@ -8,7 +8,7 @@
         xmlns:viewmodels="clr-namespace:MP3Tagger.ViewModels"
         mc:Ignorable="d"
         DataContext="{StaticResource MainWindowViewModel}"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="800" Closing="Window_Closing" KeyDown="Window_KeyDown">
     <Window.Resources>
         <Style x:Key="TreeViewItemStyle" TargetType="{x:Type TreeViewItem}">
             <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>

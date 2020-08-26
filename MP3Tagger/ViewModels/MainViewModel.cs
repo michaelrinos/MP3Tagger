@@ -9,6 +9,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace MP3Tagger.ViewModels {
     class MainViewModel : ObservableObject {
@@ -38,6 +39,8 @@ namespace MP3Tagger.ViewModels {
                 }
             }
         }
+
+        public string SelectedLocationStr { get => SelectedLocation?.Path; }
 
         public MusicEditorViewModel Manager {get => _Manager; set => Set(ref _Manager, value);}
 
@@ -73,9 +76,13 @@ namespace MP3Tagger.ViewModels {
                 }else if (Directory.Exists(searchterm))
                 {
                     var d = new DirectoryInfo(searchterm);
+                    var t = new MusicEditorViewModel(d);
+                    Manager = t;
+                    /*
                     Manager.CurrentDirectory = d;
                     Manager.LoadFiles();
                     //results.AddRange( d.GetFiles() );
+                    */
                     
                 }
 
@@ -149,7 +156,30 @@ namespace MP3Tagger.ViewModels {
 
         }
 
+        internal void DoShutdown()
+        {
+            Properties.Settings.Default.Save();
+        }
+
+        internal void DoKeyPress(System.Windows.Input.KeyEventArgs e)
+        {
+            switch (e.Key){
+                case Key.F5:
+                    Items.Clear();
+                    foreach (var di in DriveInfo.GetDrives()) {
+                        Items.Add(new FileSystemItemViewModel(di));
+                    }
+                break;
+                default:
+                    // Do something
+                    Console.WriteLine(string.Format("{0}\t{1}", e.Key, e.SystemKey));
+                break;
+            }
+        }
+
         #endregion // Methods
+
+
 
 
 

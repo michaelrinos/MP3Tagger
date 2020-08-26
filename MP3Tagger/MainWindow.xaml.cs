@@ -154,5 +154,26 @@ namespace MP3Tagger {
             }
             return ch;
         }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (DataContext != null && DataContext is MainViewModel)
+            {
+                var dc = DataContext as MainViewModel;
+                dc.DoShutdown();
+            }
+
+        }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (DataContext != null && DataContext is MainViewModel)
+            {
+                var dc = DataContext as MainViewModel;
+                dc.DoKeyPress(e);
+            }
+
+        }
     }
 }
+
