@@ -10,6 +10,19 @@
         DataContext="{StaticResource MainWindowViewModel}"
         Title="MainWindow" Height="450" Width="800" Closing="Window_Closing" KeyDown="Window_KeyDown">
     <Window.Resources>
+        <SolidColorBrush x:Key="Expander.MouseOver.Circle.Stroke" Color="#FF3C7FB1"/>
+        <SolidColorBrush x:Key="Expander.MouseOver.Circle.Fill" Color="Transparent"/>
+        <SolidColorBrush x:Key="Expander.MouseOver.Arrow.Stroke" Color="#222"/>
+        <SolidColorBrush x:Key="Expander.Pressed.Circle.Stroke" Color="#FF526C7B"/>
+        <SolidColorBrush x:Key="Expander.Pressed.Circle.Fill" Color="Transparent"/>
+        <SolidColorBrush x:Key="Expander.Pressed.Arrow.Stroke" Color="#FF003366"/>
+        <SolidColorBrush x:Key="Expander.Disabled.Circle.Stroke" Color="DarkGray"/>
+        <SolidColorBrush x:Key="Expander.Disabled.Circle.Fill" Color="Transparent"/>
+        <SolidColorBrush x:Key="Expander.Disabled.Arrow.Stroke" Color="#666"/>
+        <SolidColorBrush x:Key="Expander.Static.Circle.Fill" Color="Transparent"/>
+        <SolidColorBrush x:Key="Expander.Static.Circle.Stroke" Color="DarkGray"/>
+        <SolidColorBrush x:Key="Expander.Static.Arrow.Stroke" Color="#666"/>
+
         <Style x:Key="TreeViewItemStyle" TargetType="{x:Type TreeViewItem}">
             <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
             <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
@@ -21,40 +34,497 @@
             </Style.Triggers>
 
         </Style>
+        <Style x:Key="ExpanderRightHeaderStyle" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border Padding="{TemplateBinding Padding}">
+                            <Grid Background="Transparent" SnapsToDevicePixels="False">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="19"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="1">
+                                    <Grid.LayoutTransform>
+                                        <TransformGroup>
+                                            <TransformGroup.Children>
+                                                <TransformCollection>
+                                                    <RotateTransform Angle="270"/>
+                                                </TransformCollection>
+                                            </TransformGroup.Children>
+                                        </TransformGroup>
+                                    </Grid.LayoutTransform>
+                                    <Ellipse x:Name="circle" Fill="{StaticResource Expander.Static.Circle.Fill}" HorizontalAlignment="Center" Height="19" Stroke="{StaticResource Expander.Static.Circle.Stroke}" VerticalAlignment="Center" Width="19"/>
+                                    <Path x:Name="arrow" Data="M 1,1.5 L 4.5,5 L 8,1.5" HorizontalAlignment="Center" SnapsToDevicePixels="false" Stroke="{StaticResource Expander.Static.Arrow.Stroke}" StrokeThickness="2" VerticalAlignment="Center"/>
+                                </Grid>
+                                <ContentPresenter Grid.Row="2" HorizontalAlignment="Center" Margin="0,4,0,0" RecognizesAccessKey="True" SnapsToDevicePixels="True" VerticalAlignment="Top"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="true">
+                                <Setter Property="Data" TargetName="arrow" Value="M 1,4.5  L 4.5,1  L 8,4.5"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Stroke" TargetName="circle" Value="{StaticResource Expander.MouseOver.Circle.Stroke}"/>
+                                <Setter Property="Fill" TargetName="circle" Value="{StaticResource Expander.MouseOver.Circle.Fill}"/>
+                                <Setter Property="Stroke" TargetName="arrow" Value="{StaticResource Expander.MouseOver.Arrow.Stroke}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Stroke" TargetName="circle" Value="{StaticResource Expander.Pressed.Circle.Stroke}"/>
+                                <Setter Property="StrokeThickness" TargetName="circle" Value="1.5"/>
+                                <Setter Property="Fill" TargetName="circle" Value="{StaticResource Expander.Pressed.Circle.Fill}"/>
+                                <Setter Property="Stroke" TargetName="arrow" Value="{StaticResource Expander.Pressed.Arrow.Stroke}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Stroke" TargetName="circle" Value="{StaticResource Expander.Disabled.Circle.Stroke}"/>
+                                <Setter Property="Fill" TargetName="circle" Value="{StaticResource Expander.Disabled.Circle.Fill}"/>
+                                <Setter Property="Stroke" TargetName="arrow" Value="{StaticResource Expander.Disabled.Arrow.Stroke}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ExpanderUpHeaderStyle" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border Padding="{TemplateBinding Padding}">
+                            <Grid Background="Transparent" SnapsToDevicePixels="False">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="19"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="1">
+                                    <Grid.LayoutTransform>
+                                        <TransformGroup>
+                                            <TransformGroup.Children>
+                                                <TransformCollection>
+                                                    <RotateTransform Angle="-90"/>
+                                                </TransformCollection>
+                                            </TransformGroup.Children>
+                                        </TransformGroup>
+                                    </Grid.LayoutTransform>
+                                    <Ellipse x:Name="circle" Fill="{StaticResource Expander.Static.Circle.Fill}" HorizontalAlignment="Center" Height="19" Stroke="{StaticResource Expander.Static.Circle.Stroke}" VerticalAlignment="Center" Width="19"/>
+                                    <Path x:Name="arrow" Data="M 1,1.5 L 4.5,5 L 8,1.5" HorizontalAlignment="Center" SnapsToDevicePixels="false" Stroke="{StaticResource Expander.Static.Arrow.Stroke}" StrokeThickness="2" VerticalAlignment="Center"/>
+                                </Grid>
+                                <ContentPresenter Grid.Row="2" HorizontalAlignment="Center" Margin="0,4,0,0" RecognizesAccessKey="True" SnapsToDevicePixels="True" VerticalAlignment="Top"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="true">
+                                <Setter Property="Data" TargetName="arrow" Value="M 1,4.5  L 4.5,1  L 8,4.5"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Stroke" TargetName="circle" Value="{StaticResource Expander.MouseOver.Circle.Stroke}"/>
+                                <Setter Property="Fill" TargetName="circle" Value="{StaticResource Expander.MouseOver.Circle.Fill}"/>
+                                <Setter Property="Stroke" TargetName="arrow" Value="{StaticResource Expander.MouseOver.Arrow.Stroke}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Stroke" TargetName="circle" Value="{StaticResource Expander.Pressed.Circle.Stroke}"/>
+                                <Setter Property="StrokeThickness" TargetName="circle" Value="1.5"/>
+                                <Setter Property="Fill" TargetName="circle" Value="{StaticResource Expander.Pressed.Circle.Fill}"/>
+                                <Setter Property="Stroke" TargetName="arrow" Value="{StaticResource Expander.Pressed.Arrow.Stroke}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Stroke" TargetName="circle" Value="{StaticResource Expander.Disabled.Circle.Stroke}"/>
+                                <Setter Property="Fill" TargetName="circle" Value="{StaticResource Expander.Disabled.Circle.Fill}"/>
+                                <Setter Property="Stroke" TargetName="arrow" Value="{StaticResource Expander.Disabled.Arrow.Stroke}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ExpanderLeftHeaderStyle" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border Padding="{TemplateBinding Padding}">
+                            <Grid Background="Transparent" SnapsToDevicePixels="False">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="19"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="1">
+                                    <Grid.LayoutTransform>
+                                        <TransformGroup>
+                                            <TransformGroup.Children>
+                                                <TransformCollection>
+                                                    <RotateTransform Angle="270"/>
+                                                </TransformCollection>
+                                            </TransformGroup.Children>
+                                        </TransformGroup>
+                                    </Grid.LayoutTransform>
+                                    <Ellipse x:Name="circle" Fill="{StaticResource Expander.Static.Circle.Fill}" HorizontalAlignment="Center" Height="19" Stroke="{StaticResource Expander.Static.Circle.Stroke}" VerticalAlignment="Center" Width="19"/>
+                                    <Path x:Name="arrow" Data="M 1,1.5 L 4.5,5 L 8,1.5" HorizontalAlignment="Center" SnapsToDevicePixels="false" Stroke="{StaticResource Expander.Static.Arrow.Stroke}" StrokeThickness="2" VerticalAlignment="Center"/>
+                                </Grid>
+                                <ContentPresenter Grid.Row="2" HorizontalAlignment="Left" Margin="4,0,0,0" RecognizesAccessKey="True" SnapsToDevicePixels="True" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="true">
+                                <Setter Property="Data" TargetName="arrow" Value="M 1,4.5  L 4.5,1  L 8,4.5"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Stroke" TargetName="circle" Value="{StaticResource Expander.MouseOver.Circle.Stroke}"/>
+                                <Setter Property="Fill" TargetName="circle" Value="{StaticResource Expander.MouseOver.Circle.Fill}"/>
+                                <Setter Property="Stroke" TargetName="arrow" Value="{StaticResource Expander.MouseOver.Arrow.Stroke}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Stroke" TargetName="circle" Value="{StaticResource Expander.Pressed.Circle.Stroke}"/>
+                                <Setter Property="StrokeThickness" TargetName="circle" Value="1.5"/>
+                                <Setter Property="Fill" TargetName="circle" Value="{StaticResource Expander.Pressed.Circle.Fill}"/>
+                                <Setter Property="Stroke" TargetName="arrow" Value="{StaticResource Expander.Pressed.Arrow.Stroke}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Stroke" TargetName="circle" Value="{StaticResource Expander.Disabled.Circle.Stroke}"/>
+                                <Setter Property="Fill" TargetName="circle" Value="{StaticResource Expander.Disabled.Circle.Fill}"/>
+                                <Setter Property="Stroke" TargetName="arrow" Value="{StaticResource Expander.Disabled.Arrow.Stroke}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ExpanderHeaderFocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Border>
+                            <Rectangle Margin="0" SnapsToDevicePixels="true" Stroke="Black" StrokeThickness="1" StrokeDashArray="1 2"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ExpanderDownHeaderStyle" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border Padding="{TemplateBinding Padding}">
+                            <Grid Background="Transparent" SnapsToDevicePixels="False">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="19"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Grid>
+                                    <Grid.LayoutTransform>
+                                        <TransformGroup>
+                                            <TransformGroup.Children>
+                                                <TransformCollection>
+                                                    <RotateTransform Angle="90"/>
+                                                </TransformCollection>
+                                            </TransformGroup.Children>
+                                        </TransformGroup>
+                                    </Grid.LayoutTransform>
+                                    <Ellipse x:Name="circle" Fill="{StaticResource Expander.Static.Circle.Fill}" HorizontalAlignment="Center" Height="19" Stroke="{StaticResource Expander.Static.Circle.Stroke}" VerticalAlignment="Center" Width="19"/>
+                                    <Path x:Name="arrow" Data="M 1,1.5 L 4.5,5 L 8,1.5" HorizontalAlignment="Center" SnapsToDevicePixels="false" Stroke="{StaticResource Expander.Static.Arrow.Stroke}" StrokeThickness="2" VerticalAlignment="Center"/>
+                                </Grid>
+                                <ContentPresenter HorizontalAlignment="Center" Margin="0,4,0,0" Grid.Row="1" RecognizesAccessKey="True" SnapsToDevicePixels="True" VerticalAlignment="Top"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="true">
+                                <Setter Property="Data" TargetName="arrow" Value="M 1,4.5  L 4.5,1  L 8,4.5"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Stroke" TargetName="circle" Value="{StaticResource Expander.MouseOver.Circle.Stroke}"/>
+                                <Setter Property="Fill" TargetName="circle" Value="{StaticResource Expander.MouseOver.Circle.Fill}"/>
+                                <Setter Property="Stroke" TargetName="arrow" Value="{StaticResource Expander.MouseOver.Arrow.Stroke}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Stroke" TargetName="circle" Value="{StaticResource Expander.Pressed.Circle.Stroke}"/>
+                                <Setter Property="StrokeThickness" TargetName="circle" Value="1.5"/>
+                                <Setter Property="Fill" TargetName="circle" Value="{StaticResource Expander.Pressed.Circle.Fill}"/>
+                                <Setter Property="Stroke" TargetName="arrow" Value="{StaticResource Expander.Pressed.Arrow.Stroke}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Stroke" TargetName="circle" Value="{StaticResource Expander.Disabled.Circle.Stroke}"/>
+                                <Setter Property="Fill" TargetName="circle" Value="{StaticResource Expander.Disabled.Circle.Fill}"/>
+                                <Setter Property="Stroke" TargetName="arrow" Value="{StaticResource Expander.Disabled.Arrow.Stroke}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="MyExpanderStyle" TargetType="{x:Type Expander}">
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Expander}">
+                        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" CornerRadius="3" SnapsToDevicePixels="true">
+                            <DockPanel>
+                                <ToggleButton x:Name="HeaderSite" ContentTemplate="{TemplateBinding HeaderTemplate}" ContentTemplateSelector="{TemplateBinding HeaderTemplateSelector}" Content="{TemplateBinding Header}" DockPanel.Dock="Top" Foreground="{TemplateBinding Foreground}" FontWeight="{TemplateBinding FontWeight}" FocusVisualStyle="{StaticResource ExpanderHeaderFocusVisual}" FontStyle="{TemplateBinding FontStyle}" FontStretch="{TemplateBinding FontStretch}" FontSize="{TemplateBinding FontSize}" FontFamily="{TemplateBinding FontFamily}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Margin="1" MinWidth="0" MinHeight="0" Padding="{TemplateBinding Padding}" Style="{StaticResource ExpanderDownHeaderStyle}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                <ContentPresenter x:Name="ExpandSite" DockPanel.Dock="Bottom" Focusable="false" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" Visibility="Collapsed" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            </DockPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsExpanded" Value="true">
+                                <Setter Property="Visibility" TargetName="ExpandSite" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="ExpandDirection" Value="Right">
+                                <Setter Property="DockPanel.Dock" TargetName="ExpandSite" Value="Left"/>
+                                <Setter Property="DockPanel.Dock" TargetName="HeaderSite" Value="Right"/>
+                                <Setter Property="Style" TargetName="HeaderSite" Value="{StaticResource ExpanderRightHeaderStyle}"/>
+                            </Trigger>
+                            <Trigger Property="ExpandDirection" Value="Up">
+                                <Setter Property="DockPanel.Dock" TargetName="ExpandSite" Value="Top"/>
+                                <Setter Property="DockPanel.Dock" TargetName="HeaderSite" Value="Bottom"/>
+                                <Setter Property="Style" TargetName="HeaderSite" Value="{StaticResource ExpanderUpHeaderStyle}"/>
+                            </Trigger>
+                            <Trigger Property="ExpandDirection" Value="Left">
+                                <Setter Property="DockPanel.Dock" TargetName="ExpandSite" Value="Left"/>
+                                <Setter Property="DockPanel.Dock" TargetName="HeaderSite" Value="Right"/>
+                                <Setter Property="Style" TargetName="HeaderSite" Value="{StaticResource ExpanderLeftHeaderStyle}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <ControlTemplate x:Key="Centered" TargetType="{x:Type Expander}">
+            <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" CornerRadius="3" SnapsToDevicePixels="True" UseLayoutRounding="True" d:DesignUseLayoutRounding="True">
+                <DockPanel UseLayoutRounding="True" d:DesignUseLayoutRounding="True">
+                    <ToggleButton x:Name="HeaderSite" ContentTemplate="{TemplateBinding HeaderTemplate}" Content="{TemplateBinding Header}" DockPanel.Dock="Top" Foreground="{TemplateBinding Foreground}" FontWeight="{TemplateBinding FontWeight}" FontStyle="{TemplateBinding FontStyle}" FontStretch="{TemplateBinding FontStretch}" FontSize="{TemplateBinding FontSize}" FontFamily="{TemplateBinding FontFamily}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Margin="1" MinWidth="0" MinHeight="0" Padding="{TemplateBinding Padding}" UseLayoutRounding="True" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" d:DesignUseLayoutRounding="True">
+                        <ToggleButton.FocusVisualStyle>
+                            <Style>
+                                <Setter Property="Control.Template">
+                                    <Setter.Value>
+                                        <ControlTemplate>
+                                            <Border UseLayoutRounding="True" d:DesignUseLayoutRounding="True">
+                                                <Rectangle Margin="0" SnapsToDevicePixels="True" Stroke="Black" StrokeThickness="1" StrokeDashArray="1 2" UseLayoutRounding="True" d:DesignUseLayoutRounding="True"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ToggleButton.FocusVisualStyle>
+                        <ToggleButton.Style>
+                            <Style TargetType="{x:Type ToggleButton}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type ToggleButton}">
+                                            <Border Padding="{TemplateBinding Padding}" UseLayoutRounding="True" d:DesignUseLayoutRounding="True">
+                                                <Grid Background="Transparent" SnapsToDevicePixels="False" UseLayoutRounding="True" d:DesignUseLayoutRounding="True">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="*"/>
+                                                        <RowDefinition Height="19"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="*"/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid Grid.Row="1" UseLayoutRounding="True" d:DesignUseLayoutRounding="True">
+                                                        <Grid.LayoutTransform>
+                                                            <TransformGroup>
+                                                                <RotateTransform Angle="90"/>
+                                                            </TransformGroup>
+                                                        </Grid.LayoutTransform>
+                                                        <Ellipse x:Name="circle" Fill="Transparent" HorizontalAlignment="Center" Height="19" Stroke="DarkGray" UseLayoutRounding="True" VerticalAlignment="Center" Width="19" d:DesignUseLayoutRounding="True"/>
+                                                        <Path x:Name="arrow" Data="M1,1.5L4.5,5 8,1.5" HorizontalAlignment="Center" SnapsToDevicePixels="False" Stroke="#FF666666" StrokeThickness="2" UseLayoutRounding="True" VerticalAlignment="Center" d:DesignUseLayoutRounding="True"/>
+                                                    </Grid>
+                                                    <ContentPresenter ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" ContentStringFormat="{TemplateBinding ContentStringFormat}" HorizontalAlignment="Center" Margin="0,4,0,0" Grid.Row="2" RecognizesAccessKey="True" SnapsToDevicePixels="True" UseLayoutRounding="True" VerticalAlignment="Top" d:DesignUseLayoutRounding="True"/>
+                                                </Grid>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <!-- These control the highlighting of the arrow and other stuff-->
+                                                <Trigger Property="IsChecked" Value="True">
+                                                    <Setter Property="Data" TargetName="arrow" Value="M1,4.5L4.5,1 8,4.5"/>
+                                                </Trigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Stroke" TargetName="circle" Value="#FF3C7FB1"/>
+                                                    <Setter Property="Fill" TargetName="circle" Value="Transparent"/>
+                                                    <Setter Property="Stroke" TargetName="arrow" Value="#FF222222"/>
+                                                </Trigger>
+                                                <Trigger Property="IsPressed" Value="True">
+                                                    <Setter Property="Stroke" TargetName="circle" Value="#FF526C7B"/>
+                                                    <Setter Property="StrokeThickness" TargetName="circle" Value="1.5"/>
+                                                    <Setter Property="Fill" TargetName="circle" Value="Transparent"/>
+                                                    <Setter Property="Stroke" TargetName="arrow" Value="#FF003366"/>
+                                                </Trigger>
+                                                <Trigger Property="IsEnabled" Value="False">
+                                                    <Setter Property="Stroke" TargetName="circle" Value="DarkGray"/>
+                                                    <Setter Property="Fill" TargetName="circle" Value="Transparent"/>
+                                                    <Setter Property="Stroke" TargetName="arrow" Value="#FF666666"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ToggleButton.Style>
+                    </ToggleButton>
+                    <ContentPresenter x:Name="ExpandSite" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" ContentStringFormat="{TemplateBinding ContentStringFormat}" DockPanel.Dock="Bottom" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" UseLayoutRounding="True" Visibility="Collapsed" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" d:DesignUseLayoutRounding="True"/>
+                </DockPanel>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsExpanded" Value="True">
+                    <Setter Property="Visibility" TargetName="ExpandSite" Value="Visible"/>
+                </Trigger>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="ExpandDirection" Value="Right"/>
+                        <Condition Property="IsExpanded" Value="true"/>
+                    </MultiTrigger.Conditions>
+                    <Setter Property="Background" Value="Green" TargetName="HeaderSite"/>
+                    <Setter Property="DockPanel.Dock" TargetName="ExpandSite" Value="Left"/>
+                    <Setter Property="DockPanel.Dock" TargetName="HeaderSite" Value="Right"/>
+                    <Setter Property="Style" TargetName="HeaderSite" Value="{StaticResource ExpanderLeftHeaderStyle}"/>
+                </MultiTrigger>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="ExpandDirection" Value="Right"/>
+                        <Condition Property="IsExpanded" Value="False"/>
+                    </MultiTrigger.Conditions>
+                    <Setter Property="Background" Value="Green" TargetName="HeaderSite"/>
+                    <Setter Property="DockPanel.Dock" TargetName="ExpandSite" Value="Right"/>
+                    <Setter Property="DockPanel.Dock" TargetName="HeaderSite" Value="Left"/>
+                    <Setter Property="Style" TargetName="HeaderSite" Value="{StaticResource ExpanderRightHeaderStyle}"/>
+                </MultiTrigger>
+                <Trigger Property="ExpandDirection" Value="Left">
+                    <Setter Property="DockPanel.Dock" TargetName="ExpandSite" Value="Left"/>
+                    <Setter Property="DockPanel.Dock" TargetName="HeaderSite" Value="Right"/>
+                    <Setter Property="Style" TargetName="HeaderSite">
+                        <Setter.Value>
+                            <Style TargetType="{x:Type ToggleButton}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type ToggleButton}">
+                                            <Border Padding="{TemplateBinding Padding}" UseLayoutRounding="True" d:DesignUseLayoutRounding="True">
+                                                <Grid Background="Transparent" SnapsToDevicePixels="False" UseLayoutRounding="True" d:DesignUseLayoutRounding="True">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="*"/>
+                                                        <RowDefinition Height="19"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="*"/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid Grid.Row="1"  UseLayoutRounding="True" d:DesignUseLayoutRounding="True">
+                                                        <Grid.LayoutTransform>
+                                                            <TransformGroup>
+                                                                <RotateTransform Angle="90"/>
+                                                            </TransformGroup>
+                                                        </Grid.LayoutTransform>
+                                                        <Ellipse x:Name="circle" Fill="Transparent" HorizontalAlignment="Center" Height="19" Stroke="DarkGray" UseLayoutRounding="True" VerticalAlignment="Center" Width="19" d:DesignUseLayoutRounding="True"/>
+                                                        <Path x:Name="arrow" Data="M1,1.5L4.5,5 8,1.5" HorizontalAlignment="Center" SnapsToDevicePixels="False" Stroke="#FF666666" StrokeThickness="2" UseLayoutRounding="True" VerticalAlignment="Center" d:DesignUseLayoutRounding="True"/>
+                                                    </Grid>
+                                                    <ContentPresenter ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" Grid.Row="2" ContentStringFormat="{TemplateBinding ContentStringFormat}" HorizontalAlignment="Left" Margin="4,0,0,0" RecognizesAccessKey="True" SnapsToDevicePixels="True" UseLayoutRounding="True" VerticalAlignment="Center" d:DesignUseLayoutRounding="True"/>
+                                                </Grid>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsChecked" Value="True">
+                                                    <Setter Property="Data" TargetName="arrow" Value="M1,4.5L4.5,1 8,4.5"/>
+                                                </Trigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Stroke" TargetName="circle" Value="#FF3C7FB1"/>
+                                                    <Setter Property="Fill" TargetName="circle" Value="Transparent"/>
+                                                    <Setter Property="Stroke" TargetName="arrow" Value="#FF222222"/>
+                                                </Trigger>
+                                                <Trigger Property="IsPressed" Value="True">
+                                                    <Setter Property="Stroke" TargetName="circle" Value="#FF526C7B"/>
+                                                    <Setter Property="StrokeThickness" TargetName="circle" Value="1.5"/>
+                                                    <Setter Property="Fill" TargetName="circle" Value="Transparent"/>
+                                                    <Setter Property="Stroke" TargetName="arrow" Value="#FF003366"/>
+                                                </Trigger>
+                                                <Trigger Property="IsEnabled" Value="False">
+                                                    <Setter Property="Stroke" TargetName="circle" Value="DarkGray"/>
+                                                    <Setter Property="Fill" TargetName="circle" Value="Transparent"/>
+                                                    <Setter Property="Stroke" TargetName="arrow" Value="#FF666666"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
 
 
     </Window.Resources>
     <DockPanel LastChildFill="True">
-        <Grid DockPanel.Dock="Left" MaxWidth="200">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-        <TextBox Text="{Binding SearchText, UpdateSourceTrigger=Explicit}"
+
+
+        <Expander Background="LightGray" DockPanel.Dock="Right" ExpandDirection="Right" MaxWidth="300" Grid.RowSpan="3" Grid.Row="0" Grid.Column="2" IsExpanded="{Binding IsExpanded}" Style="{DynamicResource MyExpanderStyle}" Template="{DynamicResource Centered}">
+            <Expander.Header>
+                <TextBlock FontSize="14" Text="Similar Fields" >
+                    <TextBlock.LayoutTransform>
+                        <RotateTransform Angle="90"/>
+                    </TextBlock.LayoutTransform>
+                </TextBlock>
+            </Expander.Header>
+
+            <ListBox ItemsSource="{Binding Manager.Options}" DockPanel.Dock="Right">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding IsChecked}" VerticalAlignment="Center"/>
+                            <ContentPresenter Content="{Binding Value}"/>
+
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+
+            </ListBox>
+        </Expander>
+        <Expander Background="LightGray" DockPanel.Dock="Left" ExpandDirection="Right" MaxWidth="300" Grid.RowSpan="3" Grid.Row="0" Grid.Column="2" IsExpanded="{Binding IsExpanded}" Style="{DynamicResource MyExpanderStyle}" Template="{DynamicResource Centered}">
+            <Expander.Header>
+                <TextBlock FontSize="14" Text="Locations" >
+                    <TextBlock.LayoutTransform>
+                        <RotateTransform Angle="90"/>
+                    </TextBlock.LayoutTransform>
+                </TextBlock>
+            </Expander.Header>
+
+            <Grid DockPanel.Dock="Left" MaxWidth="200">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBox Text="{Binding SearchText, UpdateSourceTrigger=Explicit}"
                  Background="GhostWhite"
                  PreviewKeyUp="TextBox_PreviewKeyUp"
                  GotFocus="TextBox_GotFocus" 
                  LostFocus="TextBox_LostFocus" 
                  MinWidth="100"
                  VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
-        <TreeView Grid.Row="1" 
+                <TreeView Grid.Row="1" 
                   ItemContainerStyle="{StaticResource TreeViewItemStyle}"
                   ItemsSource="{Binding Items}"
                   SelectedItemChanged='TreeView_SelectedItemChanged'
                   PreviewKeyDown="TreeView_PreviewKeyDown"
                   >
-            <TreeView.Resources>
-                <HierarchicalDataTemplate DataType="{x:Type viewmodels:FileSystemItemViewModel}" ItemsSource="{Binding Items}">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="{Binding Image, UpdateSourceTrigger=PropertyChanged}"/>
-                        <TextBlock Text="{Binding Name}"/>
-                    </StackPanel>
-                </HierarchicalDataTemplate>
-                <DataTemplate DataType="{x:Type viewmodels:FakeFileSystemItemViewModel}">
-                        <TextBlock Text="{Binding Name}"/>
-                </DataTemplate>
+                    <TreeView.Resources>
+                        <HierarchicalDataTemplate DataType="{x:Type viewmodels:FileSystemItemViewModel}" ItemsSource="{Binding Items}">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="{Binding Image, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock Text="{Binding Name}"/>
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                        <DataTemplate DataType="{x:Type viewmodels:FakeFileSystemItemViewModel}">
+                            <TextBlock Text="{Binding Name}"/>
+                        </DataTemplate>
 
-                <!--
+                        <!--
                 <Style TargetType="{x:Type TreeViewItem}" >
                     <Setter Property="HeaderTemplate">
                         <Setter.Value>
@@ -71,9 +541,12 @@
                     <Setter Property="ItemsSource" Value="{Binding Items}"/>
                 </Style>
                 -->
-            </TreeView.Resources>
-        </TreeView>
-        </Grid>
+                    </TreeView.Resources>
+                </TreeView>
+            </Grid>
+
+        </Expander>
+
 
         <ListView Background="White"
                   ItemsSource="{Binding SearchResults}">
@@ -84,18 +557,6 @@
             </ListView.ItemTemplate>
         </ListView>
 
-        <ListBox ItemsSource="{Binding Manager.Options}" DockPanel.Dock="Right">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <CheckBox IsChecked="{Binding IsChecked}" VerticalAlignment="Center"/>
-                        <ContentPresenter Content="{Binding Value}"/>
-
-                    </StackPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-            
-        </ListBox>
         <ContentControl Content="{Binding Manager}"/>
 
     </DockPanel>

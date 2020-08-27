@@ -37,10 +37,11 @@ namespace MP3Tagger.ViewModels {
             CurrentDirectory = path;
 
             var t = typeof(TagLib.Tag).GetProperties().Select(x => x.Name).ToList();
+            t.AddRange(typeof(TagLib.File).GetProperties().Select(x => x.Name).ToList());
 
             _Options = new CheckableObservableCollection<string>(t);
             _Options.SetCheck("Title", true);
-            _Options.SetCheck("FirstArtist", true);
+            _Options.SetCheck("FirstPerformer", true);
             LoadFiles();
 
         }
@@ -84,63 +85,49 @@ namespace MP3Tagger.ViewModels {
         }
 
         public void RemoveDuplicates() {
-            /*
             var CWOptions = Options.CheckedItems.Cast<CheckWrapper<string>>().ToList();
-            var options = CWOptions.Select(q => string.Format("Tag.{0}", q.Value));
+            
+            var options = CWOptions.Select(q => typeof(TagLib.File).GetProperties().Any(w => w.Name.Contains(q.Value)) ? q.Value : string.Format("Tag.{0}", q.Value));
             string dynamicLinqGroupByKeySelector = 
                 "new (" + String.Join( ", ", options) + ")";
 
-            var fp = MusicFiles.Select(x => x.Tag.FirstPerformer);
             
-            var oldquery = MusicFiles.GroupBy(x => 
-                    new { x?.Tag.Title, x?.Tag.FirstPerformer })
-                .Where(g => g.Count() > 1)
-                .ToList();
+
+            var newQuery = ((System.Linq.Dynamic.Core.DynamicQueryableExtensions
+                .GroupBy(MusicFiles.AsQueryable(), dynamicLinqGroupByKeySelector)
+                .Where("x => x.Count() > 1")
+                .Select("x => x.First()")
+                ) as IEnumerable<TagLib.File>).ToList()
+                ;
+
+
             /*
-            var query = MusicFiles
-                .GroupBy(x => dynamicLinqGroupByKeySelector)
+            //Original Query
+            var query = MusicFiles.
+                GroupBy(x => new { x.Tag.Title, x.Tag.FirstPerformer })
                 .Where(g => g.Count() > 1)
-                .ToList();
-
-            var queryNew = System.Linq.Dynamic.Core.DynamicQueryableExtensions
-                .GroupBy(MusicFiles.AsQueryable(),
-                dynamicLinqGroupByKeySelector);
-
-            Console.WriteLine(query);
-            // */
-            /*
-            var dl = MusicFiles.AsQueryable().GroupBy(dynamicLinqGroupByKeySelector).
-                Where("Count() > 1");
-
-            var t = dl.Select("First()").ToDynamicArray();
-            var path = @"C:\Copies\";
-            Parallel.ForEach(t, x => {
-
-                try {
-                    if (x == null)
-                        return;
-                    var newlocation = Path.Combine(path, Path.GetFileName(x.Name));
-                    File.Copy(x.Name, newlocation, true);
-                } catch (Exception e) {
-                    Console.WriteLine(e);
-                }
-            });
-
-            */
-
-            var query = MusicFiles.GroupBy(x => new { x?.Tag.Title, x?.Tag.FirstPerformer })
-                .Where(g => g.Count() > 1)
+                .Select(x => x.First())
+                .ToList()
                 //.Select(h => h.)
                 //.Cast<TagLib.Tag>()
-                .ToList()
                 ;
 
             Console.WriteLine(query);
-            var dupes = query.Select(x => x.First());
+            // */
+
+            var dupes = newQuery;
             if (!Directory.Exists(ExportPath))
             {
                 Directory.CreateDirectory(ExportPath);
             }
+
+            RemoveDuplicates(dupes);
+            Console.WriteLine("Done");
+            
+        }
+
+        private void RemoveDuplicates(List<TagLib.File> dupes)
+        {
             Parallel.ForEach(dupes, x => {
                 try {
                     if (x == null)
@@ -157,22 +144,6 @@ namespace MP3Tagger.ViewModels {
                     Console.WriteLine(e); 
                 }
             });
-            Console.WriteLine("Done");
-            
-            /*
-            var t = oldquery.Select(x => x.First());
-            //var t = queryNew.ToDynamicList().First();
-            var path = @"D:\Music\Copies\";
-            Parallel.ForEach(t, x => {
-                try {
-                    if (x == null)
-                        return;
-                    var newlocation = Path.Combine(path, Path.GetFileName(x.Name));
-                    File.Copy(x.Name, newlocation, true);
-                }catch(Exception e) {
-                    Console.WriteLine(e); }
-            });
-            // */
         }
 
 
