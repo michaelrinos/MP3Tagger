@@ -132,11 +132,14 @@ namespace MP3Tagger.ViewModels {
             }
         }
 
-        private void InspectDirectory() {
-            foreach( var dir in ((DirectoryInfo)Info.Information).GetDirectories()) {
+        private void InspectDirectory()
+        {
+            foreach (var dir in ((DirectoryInfo)Info.Information).GetDirectories())
+            {
                 Items.Add(new FileSystemItemViewModel(dir) { Parent = this });
             }
-            foreach (var file in ((DirectoryInfo)Info.Information).GetFiles()){
+            foreach (var file in ((DirectoryInfo)Info.Information).GetFiles())
+            {
                 Items.Add(new FileSystemItemViewModel(file) { Parent = this });
             }
         }
@@ -146,8 +149,10 @@ namespace MP3Tagger.ViewModels {
 
 
     }
-    public class ShellManager {
-        public static Icon GetIcon(string path, Type type, IconSize iconSize, State state) {
+    public class ShellManager
+    {
+        public static Icon GetIcon(string path, Type type, IconSize iconSize, State state)
+        {
             var attributes = (uint)(type == Type.Folder ? FileAttribute.Directory : FileAttribute.File);
             var flags = (uint)(ShellAttribute.Icon | ShellAttribute.UseFileAttributes);
 

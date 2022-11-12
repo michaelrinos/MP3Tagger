@@ -8,12 +8,16 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using Data;
+using System.Configuration;
 
-namespace MP3Tagger.ViewModels {
-    public class MusicEditorViewModel : ObservableObject {
+namespace MP3Tagger.ViewModels
+{
+    public class MusicEditorViewModel : ObservableObject
+    {
         #region Fields
 
-        private CheckableObservableCollection<string> _Options = 
+        private CheckableObservableCollection<string> _Options =
             new CheckableObservableCollection<string>() { "This", "is", "a", "test" };
 
         #endregion // Fields
@@ -30,10 +34,12 @@ namespace MP3Tagger.ViewModels {
 
         #region Constructor
 
-        public MusicEditorViewModel() {
+        public MusicEditorViewModel()
+        {
 
         }
-        public MusicEditorViewModel(DirectoryInfo path) {
+        public MusicEditorViewModel(DirectoryInfo path)
+        {
             CurrentDirectory = path;
 
             var t = typeof(TagLib.Tag).GetProperties().Select(x => x.Name).ToList();
@@ -49,21 +55,30 @@ namespace MP3Tagger.ViewModels {
 
         #region Methods
 
-        public void LoadFiles() {
+        public void LoadFiles()
+        {
             if (CurrentDirectory == null)
                 return;
-            try {
-                var files = CurrentDirectory.GetFiles("*.mp3");
-                foreach(var file in files)
+            try
+            {
+                var fileTypes = new string[] { "*.mp3", "*.m4a" };
+                foreach (var types in fileTypes)
                 {
-                    try {
-                        var item = TagLib.File.Create(file.FullName);
-                        if (item != null && item != default(TagLib.File))
-                            MusicFiles.Add(item);
-                    } catch (Exception e) {
-                        Console.WriteLine(e);
-                    }
+                    var files = CurrentDirectory.GetFiles(types);
+                    foreach (var file in files)
+                    {
+                        try
+                        {
+                            var item = TagLib.File.Create(file.FullName);
+                            if (item != null && item != default(TagLib.File))
+                                MusicFiles.Add(item);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                        }
 
+                    }
                 }
                 /*
                 Parallel.ForEach(files, file => {
@@ -76,7 +91,9 @@ namespace MP3Tagger.ViewModels {
                     }
                 });
                 */
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
             }
         }
         private static void FindAudioFiles()
@@ -84,15 +101,18 @@ namespace MP3Tagger.ViewModels {
 
         }
 
-        public void RemoveDuplicates() {
+        public void RemoveDuplicates()
+        {
             var CWOptions = Options.CheckedItems.Cast<CheckWrapper<string>>().ToList();
-            
+
             var options = CWOptions.Select(q => typeof(TagLib.File).GetProperties().Any(w => w.Name.Contains(q.Value)) ? q.Value : string.Format("Tag.{0}", q.Value));
-            string dynamicLinqGroupByKeySelector = 
-                "new (" + String.Join( ", ", options) + ")";
+            string dynamicLinqGroupByKeySelector =
+                "new (" + String.Join(", ", options) + ")";
 
-            
 
+            var tempQuery = ((System.Linq.Dynamic.Core.DynamicQueryableExtensions
+                            .GroupBy(MusicFiles.AsQueryable(), dynamicLinqGroupByKeySelector)
+                            .Where("x => x.Count() > 1")));
             var newQuery = ((System.Linq.Dynamic.Core.DynamicQueryableExtensions
                 .GroupBy(MusicFiles.AsQueryable(), dynamicLinqGroupByKeySelector)
                 .Where("x => x.Count() > 1")
@@ -123,25 +143,67 @@ namespace MP3Tagger.ViewModels {
 
             RemoveDuplicates(dupes);
             Console.WriteLine("Done");
-            
+
+        }
+        public void writeToFile()
+        {
+            var filePath = CurrentDirectory.ToString() + "\\Files.txt";
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
+            using (StreamWriter w = File.AppendText(filePath))
+            {
+                foreach (var item in MusicFiles)
+                {
+                    w.WriteLine(string.Format("{0}\t\t\t\t\t\t{1}\t\t\t\t{2}", item.Tag.Title, item.Tag.FirstPerformer, item.Tag.FirstPerformer));
+                }
+            }
+
+            var t = ConfigurationManager.AppSettings["Temp"];
+            var ds = new DataSource("Server=localhost;Database=Music;Trusted_Connection=True;");
+            foreach (var item in MusicFiles)
+            {
+                try
+                {
+                    ds.DataManager.Parameters.Clear();
+                    ds.DataManager.Parameters.Add("Name", item.Tag.Title);
+                    ds.DataManager.Parameters.Add("Artist", item.Tag.FirstPerformer);
+                    ds.DataManager.Parameters.Add("Album", item.Tag.Album);
+                    ds.DataManager.Parameters.Add("Location", item.Name);
+
+                    ds.DataManager.RunQuery("MusicFile_Create", QueryType.QT_Sproc);
+                }catch (Exception ex)
+                {
+                    ex = ex;
+                }
+            }
+
+
+
         }
 
         private void RemoveDuplicates(List<TagLib.File> dupes)
         {
-            Parallel.ForEach(dupes, x => {
-                try {
+            Parallel.ForEach(dupes, x =>
+            {
+                try
+                {
                     if (x == null)
                         return;
                     try
                     {
                         File.Move(x.Name, ExportPath + "\\" + Path.GetFileName(x.Name));
-                    }catch (IOException e)
+                    }
+                    catch (IOException e)
                     {
                         Console.WriteLine(e.ToString());
                         e = e;
                     }
-                }catch(Exception e) { 
-                    Console.WriteLine(e); 
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
                 }
             });
         }

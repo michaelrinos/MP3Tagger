@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="ExportPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">F:\Music Copied 8_24_20\Music\TestCopy</Value>
+      <Value Profile="(Default)">K:\Music Copied 8_24_20\Music\TestCopy</Value>
     </Setting>
   </Settings>
 </SettingsFile>

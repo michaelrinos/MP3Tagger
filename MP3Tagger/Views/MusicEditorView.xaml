@@ -20,7 +20,7 @@
         </Style>
     -->
         <DataTemplate DataType="{x:Type mpeg:AudioFile}">
-            <DataGrid ItemsSource="{Binding Tag}" Background="Gray">
+            <DataGrid x:Name="myGrid" TargetUpdated="dgList_ItemCreated" ItemsSource="{Binding Tag}" Background="Gray">
                 
             </DataGrid>
         </DataTemplate>
@@ -28,19 +28,27 @@
 
     </UserControl.Resources>
     <DockPanel>
-        <UniformGrid DockPanel.Dock="Bottom">
+        <UniformGrid DockPanel.Dock="Bottom" Columns="2">
             <Label Content="Export Path:"/>
             <TextBox Text="{Binding ExportPath}"/>
             <Label Content="Check For Duplicates:"/>
             <Button DockPanel.Dock="Bottom" Content="Click me" Click="Button_Click"/>
+            <Label Content="Write to File:"/>
+            <Button DockPanel.Dock="Bottom" Content="Click me" Click="Button1_Click"/>
         </UniformGrid>
         <UniformGrid Rows="1">
-            <ListView ItemsSource="{Binding MusicFiles}"
+            <ListView 
+                    ItemsSource="{Binding MusicFiles}"
                   attached:DynamicBindingListView.GenerateColumnsGridView="True"
                   attached:DynamicBindingListView.InnerProperty="Tag"
                   >
+
                 <ListView.View>
-                    <GridView/>
+                    <GridView>
+                        <GridViewColumn Header="Title" DisplayMemberBinding="{Binding Tag.Title}" />
+                        <GridViewColumn Header="FirstPerformer" DisplayMemberBinding="{Binding Tag.FirstPerformer}" />
+                        <GridViewColumn Header="Album" DisplayMemberBinding="{Binding Tag.Album}" />
+                    </GridView>
                 </ListView.View>
             </ListView>
 

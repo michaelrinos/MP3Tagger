@@ -31,5 +31,18 @@ namespace MP3Tagger.Views {
         {
             (this.DataContext as MusicEditorViewModel).RemoveDuplicates();
         }
+        private void Button1_Click(object sender, RoutedEventArgs e)
+        {
+            (this.DataContext as MusicEditorViewModel).writeToFile();
+        }
+        private void dgList_ItemCreated(object sender, RoutedEventArgs e)
+        {
+
+            (sender as DataGrid).Columns[0].Visibility = Visibility.Collapsed;
+            (sender as DataGrid).Columns[1].Visibility = Visibility.Collapsed;
+            (sender as DataGrid).Columns[2].Visibility = Visibility.Collapsed;
+            (sender as DataGrid).Columns[3].Visibility = Visibility.Collapsed;
+            (sender as DataGrid).Columns[4].Visibility = Visibility.Collapsed;
+        }
     }
 }
