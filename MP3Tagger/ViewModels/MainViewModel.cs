@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using MP3Tagger.NewFolder;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -12,7 +15,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 
 namespace MP3Tagger.ViewModels {
-    class MainViewModel : ObservableObject {
+    public class MainViewModel : ObservableObject {
 
 
         #region Fields 
@@ -22,6 +25,7 @@ namespace MP3Tagger.ViewModels {
         private ICollectionView _SearchResults;
         private string _TreeText = string.Empty;
         private MusicEditorViewModel _Manager;
+        private IServiceProvider serviceProvider;
 
         #endregion // Fields
 
@@ -35,7 +39,7 @@ namespace MP3Tagger.ViewModels {
             get => _SelectedLocation;
             set {
                 if (Set(ref _SelectedLocation, value)) {
-                    if (value.Info.Information is DirectoryInfo ) Manager = new MusicEditorViewModel(value.Info.Information as DirectoryInfo);
+                    if (value.Info.Information is DirectoryInfo ) Manager = new MusicEditorViewModel(serviceProvider.GetRequiredService<IMusicService>(), value.Info.Information as DirectoryInfo);
                 }
             }
         }
@@ -58,7 +62,9 @@ namespace MP3Tagger.ViewModels {
 
         #region Constructor 
 
-        public MainViewModel() {
+        public MainViewModel(IServiceProvider serviceProvider) {
+
+            this.serviceProvider = serviceProvider;
             foreach (var di in DriveInfo.GetDrives()) {
                 Items.Add(new FileSystemItemViewModel(di));
             }
@@ -76,7 +82,7 @@ namespace MP3Tagger.ViewModels {
                 }else if (Directory.Exists(searchterm))
                 {
                     var d = new DirectoryInfo(searchterm);
-                    var t = new MusicEditorViewModel(d);
+                    var t = serviceProvider.GetRequiredService<MusicEditorViewModel>();
                     Manager = t;
                     /*
                     Manager.CurrentDirectory = d;

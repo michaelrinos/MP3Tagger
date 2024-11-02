@@ -25,8 +25,9 @@ namespace MP3Tagger {
 
         private DispatcherTimer timer = null;
 
-        public MainWindow() {
+        public MainWindow(MainViewModel mainViewModel) {
             InitializeComponent();
+            DataContext = mainViewModel;
         }
 
         private void TextBox_GotFocus(object sender, RoutedEventArgs e) {

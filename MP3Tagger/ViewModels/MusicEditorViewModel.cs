@@ -8,17 +8,20 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using Data;
 using System.Configuration;
+using Microsoft.AspNetCore.Mvc;
+using MP3Tagger.NewFolder;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MP3Tagger.ViewModels
 {
-    public class MusicEditorViewModel : ObservableObject
+     public class MusicEditorViewModel : ObservableObject
     {
         #region Fields
 
         private CheckableObservableCollection<string> _Options =
             new CheckableObservableCollection<string>() { "This", "is", "a", "test" };
+        private IMusicService musicService;
 
         #endregion // Fields
 
@@ -34,12 +37,9 @@ namespace MP3Tagger.ViewModels
 
         #region Constructor
 
-        public MusicEditorViewModel()
+        public MusicEditorViewModel(IMusicService musicService, DirectoryInfo path)
         {
-
-        }
-        public MusicEditorViewModel(DirectoryInfo path)
-        {
+            this.musicService = musicService;
             CurrentDirectory = path;
 
             var t = typeof(TagLib.Tag).GetProperties().Select(x => x.Name).ToList();
@@ -145,7 +145,7 @@ namespace MP3Tagger.ViewModels
             Console.WriteLine("Done");
 
         }
-        public void writeToFile()
+        public async void writeToFile()
         {
             var filePath = CurrentDirectory.ToString() + "\\Files.txt";
             if (File.Exists(filePath))
@@ -160,19 +160,21 @@ namespace MP3Tagger.ViewModels
                 }
             }
 
-            var t = ConfigurationManager.AppSettings["Temp"];
-            var ds = new DataSource("Server=localhost;Database=Music;Trusted_Connection=True;");
+            
             foreach (var item in MusicFiles)
             {
                 try
                 {
-                    ds.DataManager.Parameters.Clear();
+                    await musicService.SaveTrack(item);
+                    /*
+                    DataManager.Parameters.Clear();
                     ds.DataManager.Parameters.Add("Name", item.Tag.Title);
                     ds.DataManager.Parameters.Add("Artist", item.Tag.FirstPerformer);
                     ds.DataManager.Parameters.Add("Album", item.Tag.Album);
                     ds.DataManager.Parameters.Add("Location", item.Name);
 
                     ds.DataManager.RunQuery("MusicFile_Create", QueryType.QT_Sproc);
+                    */
                 }catch (Exception ex)
                 {
                     ex = ex;

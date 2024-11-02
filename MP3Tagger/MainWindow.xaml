@@ -7,7 +7,6 @@
         xmlns:models="clr-namespace:MP3Tagger.Models"
         xmlns:viewmodels="clr-namespace:MP3Tagger.ViewModels"
         mc:Ignorable="d"
-        DataContext="{StaticResource MainWindowViewModel}"
         Title="MainWindow" Height="450" Width="800" Closing="Window_Closing" KeyDown="Window_KeyDown">
     <Window.Resources>
         <SolidColorBrush x:Key="Expander.MouseOver.Circle.Stroke" Color="#FF3C7FB1"/>
