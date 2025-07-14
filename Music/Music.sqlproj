@@ -60,8 +60,8 @@
     <Folder Include="Stored procedures" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="Tables\MusicFiles.sql" />
-    <Build Include="Stored procedures\MusicFile_Create.sql" />
+    <Build Include="Tables\MusicTrack.sql" />
+    <Build Include="Stored procedures\MusicTrack_Insert.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Music.publish.xml" />

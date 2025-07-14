@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[MusicTrackInsert]
+﻿CREATE PROCEDURE [dbo].[MusicTrack_Insert]
     @Filename NVARCHAR(255), 
     @Title NVARCHAR(255) = NULL,
     @Artist NVARCHAR(255) = NULL,
@@ -7,7 +7,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    MERGE INTO MusicTrack AS target
+    MERGE INTO [MusicTrack] AS target
     USING (SELECT @Filename AS Filename, @Title AS Title, @Artist AS Artist, @Album AS Album) AS source
     ON 
         (target.Filename = source.Filename AND
